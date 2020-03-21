@@ -1,9 +1,12 @@
+use std::str::FromStr;
+use bigdecimal::BigDecimal;
+
 // 逆ポーランド表記の文字列を受け取り、結果を返す
-pub fn calcurate(exp: &str) -> f64 {
-    let mut stack = Vec::<f64>::new();
+pub fn calcurate(exp: &str) -> BigDecimal {
+    let mut stack = Vec::<BigDecimal>::new();
 
     for token in exp.split_whitespace() {
-        if let Ok(num) = token.parse::<f64>() {
+        if let Ok(num) = BigDecimal::from_str(token) {
             stack.push(num);
         } else {
             match token {
@@ -20,9 +23,9 @@ pub fn calcurate(exp: &str) -> f64 {
     return stack.pop().expect("Stack underflow");
 }
 
-fn execute_operator<F>(stack: &mut Vec<f64>, operation: F)
+fn execute_operator<F>(stack: &mut Vec<BigDecimal>, operation: F)
 where 
-    F: Fn(f64, f64) -> f64,
+    F: Fn(BigDecimal, BigDecimal) -> BigDecimal,
 {
     let y = stack.pop().expect("Stack underflow!");
     let x = stack.pop().expect("Stack underflow!");
@@ -37,30 +40,30 @@ mod tests {
     #[test]
     fn addition(){
         let ans = calcurate("1.21 8.98 + ");
-        assert_eq!("10.19", format!("{:.2}", ans));
+        assert_eq!("10.19", format!("{}", ans));
     }
 
     #[test]
     fn subtraction(){
         let ans = calcurate("1.21 8.98 - ");
-        assert_eq!("-7.77", format!("{:.2}", ans));
+        assert_eq!("-7.77", format!("{}", ans));
     }
 
     #[test]
     fn multiplication(){
         let ans = calcurate("1.21 8.98 * ");
-        assert_eq!("10.87", format!("{:.2}", ans));
+        assert_eq!("10.8658", format!("{}", ans));
     }
 
     #[test]
     fn division(){
-        let ans = calcurate("1.21 8.98 / ");
-        assert_eq!("0.13", format!("{:.2}", ans));
+        let ans = calcurate("0.24 0.12 / ");
+        assert_eq!("2", format!("{}", ans));
     }
 
     #[test]
     fn three_operands(){
         let ans = calcurate("1.21 8.98 0.74 + - ");
-        assert_eq!("-8.51", format!("{:.2}", ans));
+        assert_eq!("-8.51", format!("{}", ans));
     }
 }
